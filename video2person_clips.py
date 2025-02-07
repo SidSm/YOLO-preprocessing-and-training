@@ -1,14 +1,15 @@
 import cv2
 import os
 import subprocess
+import time
 from ultralytics import YOLO
 
 # ===========================
 # CONFIGURATION PARAMETERS
 # ===========================
-VIDEO_PATH = "datasets/olsanska/short-video1.mp4"      # Path to your input video file
-OUTPUT_DIR = "datasets/olsanska/clips/"          # Directory to store the extracted clips
-SAMPLE_RATE = 1               # Run inference on 1 frame per second
+VIDEO_PATH = "/mnt/data-storage/Projects/yolo-training/video1.mp4"#"datasets/olsanska/short-video1.mp4"      # Path to your input video file
+OUTPUT_DIR = "/mnt/data-storage/clips/" #"datasets/olsanska/clips/"#          # Directory to store the extracted clips
+SAMPLE_RATE = 0.2               # Run inference on 0.2 frame per second (every 5 sec)
 DETECTION_THRESHOLD = 0.5     # Minimum confidence required to consider a detection valid
 MAX_GAP = 3.0                 # Maximum gap (in seconds) between detections to merge them into one segment
 PADDING = 2.0                 # Seconds to pad at the beginning and end of each segment
@@ -38,6 +39,36 @@ if user_input != "Y":
     print("Exiting...")
     exit(0)
 
+# ===========================
+# TEST SAVING GENERATED CLIP
+# ===========================
+
+output_file = os.path.join(OUTPUT_DIR, f"test_clip.mp4")
+# Build the ffmpeg command:
+# -ss sets the start time, -to sets the end time, and -c copy copies the stream without re-encoding.
+command = [
+    "ffmpeg",
+    "-y",  # Overwrite output file if it exists
+    "-i", VIDEO_PATH,
+    "-ss", str(0),
+    "-to", str(100),
+    "-c", "copy",
+    output_file
+]
+output = subprocess.run(command)
+if int(output.returncode) == 1:
+    print("Error: cannot save clip to the output destination folder, try running with sudo python -E")
+    exit(0)
+try:
+    os.remove(output_file)
+    print(f"File '{output_file}' deleted successfully.")
+except FileNotFoundError:
+    print(f"File '{output_file}' not found.")
+except PermissionError:
+    print(f"Permission denied: Unable to delete '{output_file}'.")
+except Exception as e:
+    print(f"Error deleting file: {e}")
+
 # Since we want to run inference only once per second,
 # we will skip approximately 'fps' frames between each detection.
 skip_frames = int(fps / SAMPLE_RATE)
@@ -47,6 +78,7 @@ skip_frames = int(fps / SAMPLE_RATE)
 # ===========================
 timestamps = []  # Will store times (in seconds) when a person is detected
 current_frame_index = 0
+start_time = time.time()
 
 while current_frame_index < frame_count:
     # Set the video to the desired frame index
@@ -109,7 +141,7 @@ for t in timestamps[1:]:
 # Append the final segment.
 segments.append((max(0, segment_start - PADDING), min(duration, segment_end + PADDING)))
 
-print("\nDetected segments (with padding):")
+print(f"\nDetected segments (with padding) in {time.time()-start_time} seconds:")
 for idx, (start, end) in enumerate(segments, start=1):
     print(f"  Segment {idx}: {start:.2f} sec to {end:.2f} sec")
 
