@@ -1,13 +1,12 @@
 import cv2
 import os
-from ultralytics import YOLO
 
 # ===========================
 # CONFIGURATION PARAMETERS
 # ===========================
-OUTPUT_FRAMES = "datasets/olsanska/frames/"      # Path to the input video file
-INPUT_CLIPS = "datasets/olsanska/clips/"          # Directory to source the extracted clips
-SAMPLE_RATE = 5               # Save 1 frame every 5 frames
+OUTPUT_FRAMES = "/mnt/data-storage/frames/"#"datasets/olsanska/frames/"      # Path to the input video file
+INPUT_CLIPS = "/mnt/data-storage/clips/" #"datasets/olsanska/clips/"          # Directory to source the extracted clips
+SAMPLE_RATE = 15               # Save 1 frame every 15 frames
 
 # Get paths to all clips in input folder
 # Count frame count per each clip and iterate over that
@@ -15,10 +14,23 @@ SAMPLE_RATE = 5               # Save 1 frame every 5 frames
 
 
 file_paths = []
+will_create_new_imgs = 0
 for root, _, files in os.walk(INPUT_CLIPS):
     for file in files:
-        file_paths.append(os.path.join(root, file))
+        path = os.path.join(root, file)
+        file_paths.append(path)
+        cap = cv2.VideoCapture(path)
+        if not cap.isOpened():
+            print(f"Error opening video file: {path}")
+            exit(1)
 
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        num_of_new_imgs = ((frame_count - 1) // SAMPLE_RATE) + 1 if frame_count > 0 else 0
+
+        will_create_new_imgs += num_of_new_imgs
+
+print(f"Around new {will_create_new_imgs} images will be created")
+exit(0)
 clip_num = 0
 im_number = 0
 
@@ -40,11 +52,11 @@ for file_path in file_paths:
         ret, frame = cap.read()
         if not ret:
             break
-        cv2.imwrite(f"{OUTPUT_FRAMES}image_{clip_num}-{im_number}.jpg", frame)
+        cv2.imwrite(f"{OUTPUT_FRAMES}image_{im_number}-{clip_num}.jpg", frame)
         print(f"Created new image from clip {clip_num} at frame {current_frame_index}, img number: {im_number}")
         im_number = im_number + 1
         current_frame_index += SAMPLE_RATE
     clip_num = clip_num + 1
     cap.release()
 
-print(f"------\nWork done. Created {im_number+1} new images from {clip_num+1} clips")
+print(f"------\nWork done. Created {im_number} new images from {clip_num} clips")

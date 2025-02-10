@@ -154,6 +154,8 @@ for i, (start, end) in enumerate(segments):
     # -ss sets the start time, -to sets the end time, and -c copy copies the stream without re-encoding.
     command = [
         "ffmpeg",
+        "-loglevel",
+        "error",
         "-y",  # Overwrite output file if it exists
         "-i", VIDEO_PATH,
         "-ss", str(start),
@@ -161,6 +163,6 @@ for i, (start, end) in enumerate(segments):
         "-c", "copy",
         output_file
     ]
-    print(f"\nExtracting clip {i+1}: {output_file}")
+    print(f"\nExtracting clip {i+1}/{segments.count()}: {output_file}")
     print(f"  From {start:.2f} sec to {end:.2f} sec")
     subprocess.run(command)
