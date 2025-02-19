@@ -7,9 +7,9 @@ from ultralytics import YOLO
 # ===========================
 # CONFIGURATION PARAMETERS
 # ===========================
-VIDEO_PATH = "/mnt/data-storage/Projects/yolo-training/video1.mp4"#"datasets/olsanska/short-video1.mp4"      # Path to your input video file
-OUTPUT_DIR = "/mnt/data-storage/clips/" #"datasets/olsanska/clips/"#          # Directory to store the extracted clips
-SAMPLE_RATE = 0.2               # Run inference on 0.2 frame per second (every 5 sec)
+VIDEO_PATH = "/home/sidsm/Projects/YOLO-preprocessing-and-training/short-video1.mp4"#"datasets/olsanska/short-video1.mp4"      # Path to your input video file
+OUTPUT_DIR = "/home/sidsm/Projects/YOLO-preprocessing-and-training/test-clips" #"datasets/olsanska/clips/"#          # Directory to store the extracted clips
+SAMPLE_RATE = 0.5              # Run inference on 0.5 frame per second (every 2 sec)
 DETECTION_THRESHOLD = 0.5     # Minimum confidence required to consider a detection valid
 MAX_GAP = 3.0                 # Maximum gap (in seconds) between detections to merge them into one segment
 PADDING = 2.0                 # Seconds to pad at the beginning and end of each segment
@@ -20,8 +20,10 @@ PADDING = 2.0                 # Seconds to pad at the beginning and end of each 
 # Create output directory if it doesn't exist
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
+print("Calculating input video paramaters...")
+
 # Load the YOLOv8 model (this uses the ultralytics repo's pretrained model)
-model = YOLO('yolo11n.pt')
+model = YOLO('yolo11m.pt')
 
 # Open the video using OpenCV
 cap = cv2.VideoCapture(VIDEO_PATH)
@@ -107,7 +109,7 @@ while current_frame_index < frame_count:
 
     if person_detected:
         timestamps.append(current_time)
-        print(f"Detection at {current_time:.2f} sec")
+    print(f"Checked {current_time:.2f} sec / {duration:.2f} sec")
 
     # Jump ahead by skip_frames so that we process only 1 frame per second.
     current_frame_index += skip_frames
@@ -163,6 +165,6 @@ for i, (start, end) in enumerate(segments):
         "-c", "copy",
         output_file
     ]
-    print(f"\nExtracting clip {i+1}/{segments.count()}: {output_file}")
+    print(f"\nExtracting clip {i+1}/{len(segments)}: {output_file}")
     print(f"  From {start:.2f} sec to {end:.2f} sec")
     subprocess.run(command)

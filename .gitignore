@@ -1,5 +1,8 @@
-datasets/olsanska/
-datasets/final-1-test
+datasets/
+runs/
+test-clips/
+test-imgs/
 video1.mp4
 yolo11n.pt
 yolo11m.pt
+yolo11m.onnx
