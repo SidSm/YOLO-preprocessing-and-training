@@ -4,9 +4,9 @@ import os
 # ===========================
 # CONFIGURATION PARAMETERS
 # ===========================
-OUTPUT_FRAMES = "/mnt/data-storage/frames/"#"datasets/olsanska/frames/"      # Path to the input video file
+OUTPUT_FRAMES = "/mnt/data-storage/frames/"#"datasets/olsanska/frames/"       # Path to the output video file
 INPUT_CLIPS = "/mnt/data-storage/clips/" #"datasets/olsanska/clips/"          # Directory to source the extracted clips
-SAMPLE_RATE = 15               # Save 1 frame every 15 frames
+SAMPLE_RATE = 15               # Sample and save 1 frame every 15 frames
 
 # Get paths to all clips in input folder
 # Count frame count per each clip and iterate over that
@@ -30,7 +30,9 @@ for root, _, files in os.walk(INPUT_CLIPS):
         will_create_new_imgs += num_of_new_imgs
 
 print(f"Around new {will_create_new_imgs} images will be created")
-exit(0)
+user_input = input("Are you okay to continue? Y/n")
+if user_input != "Y":
+    exit(0)
 clip_num = 0
 im_number = 0
 

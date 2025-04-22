@@ -2,10 +2,10 @@ import os
 import shutil
 import random
 
-INPUT_FRAMES = "/mnt/data-storage/frames/"#"datasets/olsanska/frames/"      # Path to the input video file
-OUT_RANDOM_FRAMES = "/mnt/data-storage/frame-random/" #"datasets/olsanska/clips/"          # Directory to source the extracted clips
-FINAL_FRAME_COUNT = 800
-MIN_DISTANCE = 5
+INPUT_FRAMES = "/mnt/data-storage/frames/"#"datasets/olsanska/frames/"                      # Path to the input video file
+OUT_RANDOM_FRAMES = "/mnt/data-storage/frame-random/" #"datasets/olsanska/clips/"           # Directory to source the extracted clips
+FINAL_FRAME_COUNT = 800                                                                     # Number of frames that will generate
+MIN_DISTANCE = 5                                                                            # A minimal distance in directory between these frames after sorting
 
 file_paths = []
 already_chosen_imgs_paths = []
